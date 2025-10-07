@@ -20,23 +20,13 @@
   let spinIndex = 0;
   setInterval(() => { spinIndex = (spinIndex + 1) % spinners.length; }, 500);
 
-  const titles = [
-    {day:3, name:'Minor Node'},
-    {day:30, name:'Elder Node'},
-    {day:90, name:'Prime Node'},
-    {day:180, name:'Ascended Core'},
-    {day:360, name:'Eternal Construct'}
-  ];
-
   const calc = (p) => {
-    const created = p.createdAt;
     const t = now();
-    const days = Math.floor((t - created) / 86400000) + 1;
-    const totalMin = Math.floor((t - created) / 60000);
+    const totalMin = Math.floor((t - p.createdAt) / 60000);
     const hrs = Math.floor(totalMin / 60);
     const mins = totalMin % 60;
     const live = p.wallet + ((t - p.lastUpdated) / 60000) * EARN_PER_MIN;
-    return { days, hrs, mins, live };
+    return { hrs, mins, live };
   };
 
   const render = (p) => {
@@ -44,16 +34,14 @@
     if (!p) {
       center.innerHTML = `
         <div>tag: —</div>
-        <div>day: —</div>
         <div>time: —</div>
         <div>wallet: —</div>`;
       return;
     }
-    const { days, hrs, mins, live } = calc(p);
+    const { hrs, mins, live } = calc(p);
     const clockChar = `<span style="color:#a855f7">${spinners[spinIndex]}</span>`;
     center.innerHTML = `
       <div>tag: ${p.tag}</div>
-      <div>day: ${days}</div>
       <div>time: ${hrs} h ${String(mins).padStart(2, '0')} m ${clockChar}</div>
       <div>wallet: ${fmtMoney(live)} <span class="pulse-dot">•</span></div>`;
   };
@@ -82,7 +70,7 @@
     isPromptActive = true;
     center.innerHTML = `
       <div>${text}</div>
-      <input id="inline-input" class="bg-transparent border-none outline-none text-center text-gray-200 mt-2 text-sm" maxlength="3" autofocus />
+      <input id="inline-input" maxlength="3" autofocus />
     `;
     const inp = document.getElementById('inline-input');
     inp.focus();
@@ -118,7 +106,7 @@
       const hrs = Math.floor(mins / 60);
       center.innerHTML = `
         <div>welcome back node ${p.tag}.<br>
-        system drift detected — recalibrating ${hrs}h gap...<br>
+        drift detected — restoring ${hrs}h gap...<br>
         +${fmtMoney(earn)} restored.</div>`;
       setTimeout(() => { isPromptActive = false; render(current); }, 3000);
     }
@@ -164,15 +152,11 @@
   async function evoFlow() {
     if (!current) { center.innerHTML = '<div>no active tag.</div>'; return; }
     isPromptActive = true;
-    const { days } = calc(current);
-    const title = titles.slice().reverse().find(t => days >= t.day);
-    let list = titles.map(t => `${t.day}d → ${t.name}`).join('<br>');
-    let msg = `<div>evolution chart:<br>${list}</div>`;
-    if (title) msg += `<br><br>current title:<br>${title.name} (${days} day)`;
-    center.innerHTML = msg;
+    center.innerHTML = `
+      <div>evolution map unavailable<br>
+      (day tracking disabled in this mode)</div>`;
   }
 
-  // 🔮 updated pingFlow — only show active created nodes
   async function pingFlow() {
     isPromptActive = true;
     const all = await db.players.toArray();
@@ -180,20 +164,16 @@
       center.innerHTML = `> ping<br>response: no response from source.`;
       return;
     }
-
-    // random chance keep alive
     if (all.length === 1 && Math.random() < 0.5) {
       center.innerHTML = `> ping<br>response: keep alive.`;
       return;
     }
-
     let lines = all.map(p => {
       const { hrs, mins } = calc(p);
       const h = hrs > 0 ? `${hrs}h ` : '';
       const m = `${String(mins).padStart(2,'0')}m`;
       return `node ${p.tag} [${h}${m}] still alive.`;
     });
-
     center.innerHTML = `> ping<br>response:<br>${lines.join('<br>')}`;
   }
 
