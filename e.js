@@ -1,12 +1,12 @@
 (async function(){
   const EARN_PER_MIN = 0.01;
   const db = new Dexie('gailnireus_db_v1');
-  db.version(1).stores({ players: 'tag,createdAt,lastUpdated,wallet' });
+  db.version(1).stores({ players: 'tag,createdAt,lastUpdated,wallet,vault' });
 
   const center = document.getElementById('center');
   const createLink = document.getElementById('create-link');
   const resetLink = document.getElementById('reset-link');
-  const evoLink = document.getElementById('evo-link');
+  const vaultLink = document.getElementById('vault-link');
   const pingLink = document.getElementById('ping-link');
 
   let current = null;
@@ -89,7 +89,7 @@
   document.addEventListener('click', (e) => {
     if (!isPromptActive) return;
     const id = e.target.id;
-    if (['create-link','reset-link','evo-link','ping-link'].includes(id)) return;
+    if (['create-link','reset-link','vault-link','ping-link'].includes(id)) return;
     isPromptActive = false;
     render(current);
   });
@@ -106,7 +106,7 @@
       const hrs = Math.floor(mins / 60);
       center.innerHTML = `
         <div>welcome back node ${p.tag}.<br>
-        drift detected — restoring ${hrs}h gap...<br>
+        system drift detected — recalibrating ${hrs}h gap...<br>
         +${fmtMoney(earn)} restored.</div>`;
       setTimeout(() => { isPromptActive = false; render(current); }, 3000);
     }
@@ -123,7 +123,7 @@
         setTimeout(() => { isPromptActive = false; render(current); }, 1500);
       } else {
         const t = now();
-        p = { tag: val, createdAt: t, lastUpdated: t, wallet: 0 };
+        p = { tag: val, createdAt: t, lastUpdated: t, wallet: 0, vault: 0 };
         await db.players.add(p);
         current = p;
         localStorage.setItem('gailnireus_last_tag', val);
@@ -149,12 +149,55 @@
     });
   }
 
-  async function evoFlow() {
+  // 🪙 VAULT SYSTEM
+  async function vaultFlow() {
     if (!current) { center.innerHTML = '<div>no active tag.</div>'; return; }
     isPromptActive = true;
+    const { live } = calc(current);
+    const total = current.vault ?? 0;
     center.innerHTML = `
-      <div>evolution map unavailable<br>
-      (day tracking disabled in this mode)</div>`;
+      > vault<br>
+      response:<br>
+      total stored: ${fmtMoney(total)}<br>
+      active wallet: ${fmtMoney(live)}<br><br>
+      <a href="#" id="deposit-btn">[deposit]</a>
+      <a href="#" id="withdraw-btn">[withdraw]</a>
+    `;
+
+    const depositBtn = document.getElementById('deposit-btn');
+    const withdrawBtn = document.getElementById('withdraw-btn');
+
+    depositBtn.onclick = async (e) => {
+      e.preventDefault();
+      const { live } = calc(current);
+      if (live <= 0) {
+        center.innerHTML = '> deposit<br>response: nothing to move.';
+        setTimeout(() => { isPromptActive = false; render(current); }, 4000);
+        return;
+      }
+      current.wallet = 0;
+      current.lastUpdated = now();
+      current.vault += live;
+      await db.players.put(current);
+      center.innerHTML = `> deposit<br>response: +${fmtMoney(live)} moved to vault.`;
+      setTimeout(() => { isPromptActive = false; render(current); }, 4000);
+    };
+
+    withdrawBtn.onclick = async (e) => {
+      e.preventDefault();
+      const amt = current.vault ?? 0;
+      if (amt <= 0) {
+        center.innerHTML = '> withdraw<br>response: vault empty.';
+        setTimeout(() => { isPromptActive = false; render(current); }, 4000);
+        return;
+      }
+      current.vault = 0;
+      current.wallet += amt;
+      current.lastUpdated = now();
+      await db.players.put(current);
+      center.innerHTML = `> withdraw<br>response: +${fmtMoney(amt)} moved to wallet.`;
+      setTimeout(() => { isPromptActive = false; render(current); }, 4000);
+    };
   }
 
   async function pingFlow() {
@@ -179,14 +222,18 @@
 
   createLink.onclick = e => { e.preventDefault(); createFlow(); };
   resetLink.onclick = e => { e.preventDefault(); resetFlow(); };
-  evoLink.onclick = e => { e.preventDefault(); evoFlow(); };
+  vaultLink.onclick = e => { e.preventDefault(); vaultFlow(); };
   pingLink.onclick = e => { e.preventDefault(); pingFlow(); };
 
   const last = localStorage.getItem('gailnireus_last_tag');
   if (last) {
     const p = await db.players.get(last);
-    if (p) { current = p; await applyOfflineEarnings(p); render(p); }
-    else render(null);
+    if (p) {
+      if (p.vault === undefined) p.vault = 0;
+      current = p;
+      await applyOfflineEarnings(p);
+      render(p);
+    } else render(null);
   } else render(null);
 
   startTicker();
