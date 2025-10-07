@@ -65,6 +65,8 @@
       color: #e5e7eb;
       font-size: 0.8rem;
     }
+    /* small link-style buttons inside center (for vault) */
+    .center-link { color: #a855f7; text-decoration: none; margin: 0 6px; }
   </style>
 </head>
 <body>
@@ -75,7 +77,13 @@
     <a href="#" id="reset-link">reset</a>
     <a href="#" id="vault-link">vault</a>
     <a href="#" id="ping-link">ping</a>
+    <a href="#" id="save-link">save</a>
+    <a href="#" id="load-link">load</a>
   </div>
+
+  <!-- hidden file input for load -->
+  <input type="file" id="file-input" accept=".json,application/json" style="display:none" />
+
   <script src="e.js"></script>
 </body>
 </html>
