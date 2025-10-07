@@ -4,52 +4,53 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>gailnireus</title>
-  <script src="https://cdn.jsdelivr.net/npm/dexie@3.2.4/dist/dexie.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dexie@3.2.3/dist/dexie.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    html,body {
-      background-color: #111;
+    body {
+      background-color: #0a0a0a;
       color: #d1d5db;
-      font-family: monospace;
-      height: 100%;
-      margin: 0;
-      padding: 0;
+      font-family: ui-monospace, monospace;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      overflow: hidden;
+    }
+    #top {
+      position: fixed;
+      top: 1rem;
+      text-align: center;
+      font-weight: 600;
+      color: #9ca3af;
     }
     #center {
       position: fixed;
       top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      transform: translateY(-50%);
       text-align: center;
-      font-size: 0.875rem; /* text-sm */
-      line-height: 1.5;
+      font-size: 0.8rem;
+      color: #e5e7eb;
+      width: 100%;
     }
-    #top-name {
+    #bottom {
       position: fixed;
-      top: 8px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-weight: bold;
+      bottom: 1rem;
+      text-align: center;
       color: #9ca3af;
+      font-size: 0.8rem;
     }
-    #bottom-links {
-      position: fixed;
-      bottom: 8px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 1.25rem;
-      color: #9ca3af;
-    }
-    #bottom-links a {
-      text-decoration: none;
-    }
-    #bottom-links a:hover {
+    a {
       color: #a855f7;
+      text-decoration: none;
+      margin: 0 6px;
     }
-
+    a:hover {
+      color: #c084fc;
+    }
     @keyframes pulse {
-      0%,100% { opacity: 0.2; transform: scale(1); }
+      0%, 100% { opacity: 0.2; transform: scale(1); }
       50% { opacity: 1; transform: scale(1.4); }
     }
     .pulse-dot {
@@ -58,12 +59,20 @@
       color: #a855f7;
       animation: pulse 1.2s infinite;
     }
+    input {
+      background: transparent;
+      border: none;
+      outline: none;
+      text-align: center;
+      color: #e5e7eb;
+      font-size: 0.8rem;
+    }
   </style>
 </head>
 <body>
-  <div id="top-name">gailnireus</div>
-  <div id="center"></div>
-  <div id="bottom-links">
+  <div id="top">gailnireus</div>
+  <div id="center">loading...</div>
+  <div id="bottom">
     <a href="#" id="create-link">create</a>
     <a href="#" id="reset-link">reset</a>
     <a href="#" id="evo-link">evo</a>
