@@ -21,7 +21,8 @@
 
   // --- evolution titles ---
   const titles = [
-    {day:3, name:'Minor Node'},
+    {day:1, name:'Shy Node'},
+    {day:17, name:'Minor Node'},
     {day:30, name:'Elder Node'},
     {day:90, name:'Prime Node'},
     {day:180, name:'Ascended Core'},
@@ -170,7 +171,7 @@
       const p=await db.players.get(val);
       if(!p){
         center.innerHTML='<div class="text-sm">not found.</div>';
-        setTimeout(()=>{isPromptActive=false;render(current)},2000);
+        setTimeout(()=>{isPromptActive=false;render(current)},4000);
         return;
       }
       await db.players.delete(val);
@@ -184,7 +185,7 @@
   async function evoFlow(){
     if(!current){
       center.innerHTML='<div class="text-sm">no active tag.</div>';
-      setTimeout(()=>{isPromptActive=false;render(current)},2000);
+      setTimeout(()=>{isPromptActive=false;render(current)},4000);
       return;
     }
     const {days}=calc(current);
@@ -201,7 +202,7 @@
     const all=await db.players.toArray();
     if(all.length===0){
       center.innerHTML='<div class="text-sm">no nodes detected.</div>';
-      setTimeout(()=>{isPromptActive=false;render(current)},2000);
+      setTimeout(()=>{isPromptActive=false;render(current)},4000);
       return;
     }
     let lines=all.map(p=>{
