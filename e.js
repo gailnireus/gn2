@@ -1,6 +1,6 @@
 (async function(){
 const EARN_PER_MIN = 0.01;
-const TAX_INTERVAL_MIN = 60; // 1 jam
+const TAX_INTERVAL_MIN = 10; // 10 min
 let lastTax = Date.now();
 
 const db = new Dexie('gailnireus_db_v1');
@@ -13,14 +13,6 @@ const vaultLink = document.getElementById('vault-link');
 const pingLink = document.getElementById('ping-link');
 const saveLink = document.getElementById('save-link');
 const loadLink = document.getElementById('load-link');
-
-// Schrödinger Box link
-const openLink = document.createElement('a');
-openLink.href='#';
-openLink.id='open-link';
-openLink.className='center-link';
-openLink.textContent='open';
-document.getElementById('bottom').appendChild(openLink);
 
 const fileInput = document.getElementById('file-input');
 
@@ -96,7 +88,7 @@ const showPrompt = (text, cb) => {
 document.addEventListener('click', e=>{
   if(!isPromptActive) return;
   const id = e.target.id;
-  if(['create-link','reset-link','vault-link','ping-link','save-link','load-link','open-link'].includes(id)) return;
+  if(['create-link','reset-link','vault-link','ping-link','save-link','load-link'].includes(id)) return;
   isPromptActive=false; render(current);
 });
 
@@ -241,31 +233,6 @@ async function loadFlow(){
   };
 }
 
-// ---------------- Schrödinger Box ----------------
-async function openBoxFlow(){
-  if(!current){center.innerHTML='no active node'; return;}
-  isPromptActive=true;
-  center.innerHTML=`> open<br>press Enter to open the box`;
-  const inp=document.createElement('input');
-  inp.id='inline-input'; inp.autofocus=true;
-  center.appendChild(inp);
-  inp.focus();
-  inp.addEventListener('keydown', async e=>{
-    if(e.key==='Enter'){
-      const cost = 0.01 + Math.random()*0.02;
-      const reward = Math.random()*0.1;
-      await persist(current);
-      current.wallet -= cost;
-      if(current.wallet<0) current.wallet=0;
-      current.wallet += reward;
-      await db.players.put(current);
-      center.innerHTML=`> open<br>box hums... you got +${fmtMoney(reward)}`;
-      setTimeout(()=>{isPromptActive=false; render(current);},2000);
-    }
-    else if(e.key==='Escape'){isPromptActive=false; render(current);}
-  });
-}
-
 // ---------------- LINK HANDLERS ----------------
 createLink.onclick=e=>{e.preventDefault(); createFlow();};
 resetLink.onclick=e=>{e.preventDefault(); resetFlow();};
@@ -273,7 +240,6 @@ vaultLink.onclick=e=>{e.preventDefault(); vaultFlow();};
 pingLink.onclick=e=>{e.preventDefault(); pingFlow();};
 saveLink.onclick=e=>{e.preventDefault(); saveFlow();};
 loadLink.onclick=e=>{e.preventDefault(); loadFlow();};
-openLink.onclick=e=>{e.preventDefault(); openBoxFlow();};
 
 // ---------------- INITIAL LOAD ----------------
 const last = localStorage.getItem('gailnireus_last_tag');
