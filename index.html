@@ -1,89 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>gailnireus</title>
-  <script src="https://cdn.jsdelivr.net/npm/dexie@3.2.3/dist/dexie.min.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body {
-      background-color: #0a0a0a;
-      color: #d1d5db;
-      font-family: ui-monospace, monospace;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      align-items: center;
-      overflow: hidden;
-    }
-    #top {
-      position: fixed;
-      top: 1rem;
-      text-align: center;
-      font-weight: 600;
-      color: #9ca3af;
-    }
-    #center {
-      position: fixed;
-      top: 50%;
-      transform: translateY(-50%);
-      text-align: center;
-      font-size: 0.8rem;
-      color: #e5e7eb;
-      width: 100%;
-    }
-    #bottom {
-      position: fixed;
-      bottom: 1rem;
-      text-align: center;
-      color: #9ca3af;
-      font-size: 0.8rem;
-    }
-    a {
-      color: #a855f7;
-      text-decoration: none;
-      margin: 0 6px;
-    }
-    a:hover { color: #c084fc; }
-    @keyframes pulse {
-      0%, 100% { opacity: 0.2; transform: scale(1); }
-      50% { opacity: 1; transform: scale(1.4); }
-    }
-    .pulse-dot {
-      display: inline-block;
-      margin-left: 6px;
-      color: #a855f7;
-      animation: pulse 1.2s infinite;
-    }
-    input {
-      background: transparent;
-      border: none;
-      outline: none;
-      text-align: center;
-      color: #e5e7eb;
-      font-size: 0.8rem;
-    }
-    /* small link-style buttons inside center (for vault) */
-    .center-link { color: #a855f7; text-decoration: none; margin: 0 6px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>gailnireus</title>
+<script src="https://unpkg.com/dexie@3.2.2/dist/dexie.js"></script>
+<script src="e.js" defer></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { background-color:#111; color:#ccc; font-family:monospace; height:100vh; display:flex; flex-direction:column; justify-content:space-between; margin:0; }
+  #center { text-align:center; margin:auto; font-size:0.9rem; }
+  .center-link { color:#a5f3fc; cursor:pointer; text-decoration:none; margin:0 5px; }
+  .pulse-dot { display:inline-block; color:#a855f7; animation:pulse 1s infinite; }
+  @keyframes pulse {0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.5);opacity:0.5;}}
+  .tag-flash { color: #8b5cf6; display:inline-block; animation:flash 0.8s infinite alternate; }
+  @keyframes flash { from { opacity:0.2;} to { opacity:1; } }
+  #bottom { text-align:center; padding:1rem; }
+  input#inline-input { background:#222; color:#ccc; border:none; outline:none; width:3ch; text-align:center; }
+</style>
 </head>
 <body>
-  <div id="top">gailnireus</div>
-  <div id="center">loading...</div>
-  <div id="bottom">
-    <a href="#" id="create-link">create</a>
-    <a href="#" id="reset-link">reset</a>
-    <a href="#" id="vault-link">vault</a>
-    <a href="#" id="ping-link">ping</a>
-    <a href="#" id="save-link">save</a>
-    <a href="#" id="load-link">load</a>
-  </div>
 
-  <!-- hidden file input for load -->
-  <input type="file" id="file-input" accept=".json,application/json" style="display:none" />
+<div id="top" class="text-center text-xl font-bold mt-2">gailnireus</div>
+<div id="center"></div>
 
-  <script src="e.js"></script>
+<div id="bottom">
+  <a href="#" id="create-link" class="center-link">create</a>
+  <a href="#" id="reset-link" class="center-link">reset</a>
+  <a href="#" id="vault-link" class="center-link">vault</a>
+  <a href="#" id="ping-link" class="center-link">ping</a>
+  <a href="#" id="save-link" class="center-link">save</a>
+  <a href="#" id="load-link" class="center-link">load</a>
+</div>
+
+<input type="file" id="file-input" style="display:none" />
+
 </body>
 </html>
